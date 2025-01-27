@@ -41,6 +41,7 @@ class FlowPredictionModule(LightningModule):
         net: torch.nn.Module,
         optimizer: torch.optim.Optimizer,
         scheduler: torch.optim.lr_scheduler,
+        compile: bool,
     ) -> None:
         super().__init__()
 
@@ -87,7 +88,7 @@ class FlowPredictionModule(LightningModule):
         # so it's worth to make sure validation metrics don't store results from these checks
         self.train_loss.reset()
         self.val_loss.reset()
-        self.val_acc_best.reset()
+        self.val_loss_best.reset()
 
     def model_step(self, batch: Tuple[torch.Tensor, torch.Tensor]) -> torch.Tensor:
         """Perform a single model step on a batch of data.
