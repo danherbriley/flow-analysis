@@ -9,7 +9,7 @@ class NeuralNetworkPlain(nn.Module):
         self,
         layer_cnt: int,
         neuron_cnt: int,
-        activation_func: nn.Module,
+        activation_func: str,
         input_cnt: int,
         output_cnt: int,
     ):
@@ -21,12 +21,12 @@ class NeuralNetworkPlain(nn.Module):
         :param output_cnt: The number of output features.
         """
         super().__init__()
-        self.act_func = activation_func
+        self.act_func = getattr(nn, activation_func)
 
-        layers = [nn.Linear(input_cnt, neuron_cnt), activation_func(inplace=True)]
+        layers = [nn.Linear(input_cnt, neuron_cnt), self.act_func(inplace=True)]
         for i in range(layer_cnt - 2):
             layers.append(nn.Linear(neuron_cnt, neuron_cnt))
-            layers.append(activation_func(inplace=True))
+            layers.append(self.act_func(inplace=True))
         layers.append(nn.Linear(neuron_cnt, output_cnt))
 
         self.layers = nn.Sequential(*layers)
