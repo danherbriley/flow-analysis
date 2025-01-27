@@ -11,7 +11,7 @@ log = RankedLogger(__name__, rank_zero_only=True)
 
 class FlowDataset(TensorDataset):
     """FlowDataset class for loading 3D flow data in the form of velocity gradients from CSV files.
-    Gradients are stored as tensors of shape (9, 1)."""
+    Gradients are stored as tensors of shape (10, 1) (incl. ResVort)."""
 
     def __init__(self, data_dir: str, dataset_name: str):
         """Initializes the FlowDataset class.
@@ -19,30 +19,30 @@ class FlowDataset(TensorDataset):
         :param data_dir: The directory where the dataset is stored.
         :param dataset_name: The name of the dataset file.
         """
-        columns = (
-            [
-                "A11",
-                "A21",
-                "A31",
-                "A12",
-                "A22",
-                "A32",
-                "A13",
-                "A23",
-                "A33",
-                "ResVort",
-            ],
-        )
+        columns = [
+            "A11",
+            "A21",
+            "A31",
+            "A12",
+            "A22",
+            "A32",
+            "A13",
+            "A23",
+            "A33",
+            "ResVort",
+        ]
 
-        flow_data = pd.read_csv(os.path.join(data_dir, dataset_name))
+        log.info(f"Loading dataset from {os.path.join(data_dir, dataset_name)}.")
+        flow_data = pd.read_csv(os.path.join(data_dir, dataset_name), usecols=columns)
         log.info(f"Loaded dataset from {os.path.join(data_dir, dataset_name)}.")
 
         flow_data = self._preprocess_dataframe(flow_data)
         log.info("Preprocessed the dataset.")
 
-        flow_data = tensor(flow_data.values, dtype=float32)
+        flow_data_tensor = tensor(flow_data.loc[:, "A11":"A33"].values, dtype=float32)
+        res_vort_tensor = tensor(flow_data["ResVort"].values, dtype=float32).unsqueeze(1)
 
-        super().__init__(flow_data)
+        super().__init__(flow_data_tensor, res_vort_tensor)
 
     def _preprocess_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
         """Preprocesses the dataframe by transforming / cleaning data.
