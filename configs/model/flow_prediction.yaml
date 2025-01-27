@@ -14,11 +14,11 @@ scheduler:
   threshold: 0.1
 
 net:
-  _target_: src.models.components.simple_dense_net.SimpleDenseNet
+  _target_: src.models.components.dense_net.NeuralNetworkPlain
   layer_cnt: 10
   neuron_cnt: 1000
-  act_func: ReLU
-  input_cnt: 8
+  activation_func: ReLU
+  input_cnt: 9
   output_cnt: 1
 
 # compile model for faster training with pytorch 2.0
