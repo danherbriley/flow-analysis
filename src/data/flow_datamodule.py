@@ -4,9 +4,12 @@ import torch
 from lightning import LightningDataModule
 from torch.utils.data import ConcatDataset, DataLoader, random_split
 
-from src.data.components.flow_dataset import FlowDataset
+from src.data.components.flow_dataset import (
+    FlowDataset,
+    FlowDataSetComplete,
+    FlowDatasetResVort,
+)
 from src.utils import RankedLogger
-
 
 log = RankedLogger(__name__, rank_zero_only=True)
 
@@ -53,10 +56,15 @@ class FlowDataModule(LightningDataModule):
         self,
         data_dir: str = "data/",
         dataset_name: str = "flow_dataset.csv",
-        train_val_test_split: Tuple[float | int, float | int, float | int] = (5/6, 1/12, 1/12),
+        train_val_test_split: Tuple[float | int, float | int, float | int] = (
+            5 / 6,
+            1 / 12,
+            1 / 12,
+        ),
         batch_size: int = 64,
         num_workers: int = 0,
         pin_memory: bool = False,
+        type: str = "complete",
     ) -> None:
         """Initialize a `MNISTDataModule`.
 
@@ -66,6 +74,7 @@ class FlowDataModule(LightningDataModule):
         :param batch_size: The batch size. Defaults to `64`.
         :param num_workers: The number of workers. Defaults to `0`.
         :param pin_memory: Whether to pin memory. Defaults to `False`.
+        :param type: The type of dataset to load. Defaults to `"complete"`.
         """
         super().__init__()
 
@@ -107,7 +116,16 @@ class FlowDataModule(LightningDataModule):
                 )
             self.batch_size_per_device = self.hparams.batch_size // self.trainer.world_size
 
-        flow_dataset = FlowDataset(data_dir=self.hparams.data_dir, dataset_name=self.hparams.dataset_name)
+        if self.hparams.type == "complete":
+            flow_dataset = FlowDataSetComplete(
+                data_dir=self.hparams.data_dir, dataset_name=self.hparams.dataset_name
+            )
+        elif self.hparams.type == "resvort":
+            flow_dataset = FlowDatasetResVort(
+                data_dir=self.hparams.data_dir, dataset_name=self.hparams.dataset_name
+            )
+        else:
+            raise ValueError(f"Unknown dataset type: {self.hparams.type}")
         log.info("Loaded FlowDataset.")
 
         # load and split datasets only if not loaded already
@@ -170,6 +188,3 @@ class FlowDataModule(LightningDataModule):
 
 if __name__ == "__main__":
     _ = FlowDataModule()
-
-
-

@@ -1,0 +1,21 @@
+# @package _global_
+
+# to execute this experiment run:
+# python train.py experiment=complete
+
+defaults:
+  - override /data: flow_datamodule
+  - override /model: flow_prediction
+  - override /paths: default
+
+tags: ["flow_analysis", "complete decomposition prediction"]
+
+data:
+  type: complete
+
+model:
+  net:
+    output_cnt: 3
+
+paths:
+  data_dir: /project/project_465001585/viry/trenovaci_data/stlacitelne
