@@ -5,13 +5,13 @@ optimizer:
   _partial_: true
   lr: 0.001
 
-scheduler:
-  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
-  _partial_: true
-  mode: min
-  factor: 0.5
-  patience: 4
-  threshold: 0.1
+# scheduler:
+#   _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+#   _partial_: true
+#   mode: min
+#   factor: 0.5
+#   patience: 4
+#   threshold: 0.1
 
 net:
   _target_: src.models.components.dense_net.NeuralNetworkPlain
