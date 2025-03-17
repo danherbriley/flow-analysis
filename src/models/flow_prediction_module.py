@@ -40,8 +40,8 @@ class FlowPredictionModule(LightningModule):
         self,
         net: torch.nn.Module,
         optimizer: torch.optim.Optimizer,
-        scheduler: torch.optim.lr_scheduler,
-        compile: bool,
+        scheduler: torch.optim.lr_scheduler = None,
+        compile: bool = False,
     ) -> None:
         super().__init__()
 
