@@ -59,6 +59,10 @@ class FlowPredictionModule(LightningModule):
         self.val_loss = MeanMetric()
         self.test_loss = MeanMetric()
 
+        self.test_loss_vort = MeanMetric()
+        self.test_loss_strain = MeanMetric()
+        self.test_loss_shear = MeanMetric()
+
         # for tracking best so far validation accuracy
         self.val_loss_best = MinMetric()
 
@@ -104,6 +108,17 @@ class FlowPredictionModule(LightningModule):
         prediction = self.forward(x)
         loss = self.criterion(prediction, y)
         return loss
+
+    def model_test_step(self, batch: Tuple[torch.Tensor, torch.Tensor]) -> torch.Tensor:
+        x, y = batch
+        prediction = self.forward(x)
+        loss = self.criterion(prediction, y)
+        loss_vort = self.criterion(prediction[:, 0], y[:, 0])
+        loss_strain = self.criterion(prediction[:, 1], y[:, 1])
+        loss_shear = self.criterion(prediction[:, 2], y[:, 2])
+
+        return loss, loss_vort, loss_strain, loss_shear
+
 
     def training_step(
         self, batch: Tuple[torch.Tensor, torch.Tensor], batch_idx: int
@@ -152,11 +167,17 @@ class FlowPredictionModule(LightningModule):
             labels.
         :param batch_idx: The index of the current batch.
         """
-        loss, preds, targets = self.model_step(batch)
+        loss, loss_vort, loss_strain, loss_shear = self.model_test_step(batch)
 
         # update and log metrics
         self.test_loss(loss)
+        self.test_loss_vort(loss_vort)
+        self.test_loss_strain(loss_strain)
+        self.test_loss_shear(loss_shear)
         self.log("test/loss", self.test_loss, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("test/loss_vort", self.test_loss_vort, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("test/loss_strain", self.test_loss_strain, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("test/loss_shear", self.test_loss_shear, on_step=False, on_epoch=True, prog_bar=True)
 
 
 if __name__ == "__main__":

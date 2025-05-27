@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Optional, Tuple
 
+import gc
 import hydra
 import lightning as L
 import rootutils
@@ -125,6 +126,7 @@ def main(cfg: DictConfig) -> Optional[float]:
     )
 
     # return optimized metric
+    gc.collect()
     return metric_value
 
 

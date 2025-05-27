@@ -1,0 +1,45 @@
+# @package _global_
+
+# to execute this experiment run:
+# python train.py experiment=complete
+
+defaults:
+  - override /data: flow_datamodule
+  - override /model: flow_prediction
+  - override /paths: default
+  - override /trainer: default
+
+tags: ["flow_analysis", "single model train"]
+
+data:
+  type: complete
+  num_workers: 14
+  batch_size: 81
+
+model:
+  net:
+    layer_cnt: 7
+    neuron_cnt: 250
+    output_cnt: 3
+    activation_func: ReLU
+  optimizer:
+    lr: 0.00002835685427387834
+  scheduler:
+    _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+    _partial_: true
+    mode: min
+    factor: 0.5
+    patience: 4
+    threshold: 0.1
+
+paths:
+  data_dir: /project/project_465001585/viry/trenovaci_data/stlacitelne
+  log_dir: /scratch/project_465001585/viry/logs
+
+logger:
+  wandb:
+    project: complete_v4_single_models
+
+trainer:
+  limit_train_batches: 0.1
+  max_epochs: 1000

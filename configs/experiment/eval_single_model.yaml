@@ -8,23 +8,23 @@ defaults:
   - override /model: flow_prediction
   - override /paths: default
 
-tags: ["flow_analysis", "complete decomposition prediction"]
+tags: ["flow_analysis", "single model train"]
 
 data:
   type: complete
   num_workers: 14
+  batch_size: 81
 
 model:
   net:
+    layer_cnt: 10
+    neuron_cnt: 2000
     output_cnt: 3
+    activation_func: ReLU
 
 paths:
   data_dir: /project/project_465001585/viry/trenovaci_data/stlacitelne
   log_dir: /scratch/project_465001585/viry/logs
 
-logger:
-  wandb:
-    project: complete_v4
-
-trainer:
-  limit_train_batches: 0.1
+ckpt_path:
+  /scratch/project_465001585/viry/logs/train/runs/2025-04-23_01-47-05/checkpoints/epoch_119.ckpt

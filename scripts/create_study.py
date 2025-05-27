@@ -3,4 +3,4 @@ import optuna
 
 study_name = "/project/project_465001585/viry/flow-analysis/data"
 storage_name = f"sqlite:///{study_name}.db"
-optuna.create_study(direction="minimize", pruner=optuna.pruners.MedianPruner(n_warmup_steps=10), storage=storage_name, study_name=study_name)
+optuna.create_study(direction="minimize", pruner=optuna.pruners.MedianPruner(n_warmup_steps=5), storage=storage_name, study_name=study_name)
